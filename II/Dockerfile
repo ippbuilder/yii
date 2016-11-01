@@ -13,7 +13,7 @@ RUN echo "Acquire::http {No-Cache=True;};" > /etc/apt/apt.conf.d/no-cache
 RUN apt-get update && apt-get install -y sendmail libmcrypt-dev libmemcached-dev libpng12-dev libjpeg-dev git \
  && rm -rf /var/lib/apt/lists/* \
 s && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
- && docker-php-ext-install gd mcrypt mysql pdo_mysql \
+ && docker-php-ext-install gd mcrypt mysqli pdo_mysql \
  && docker-php-ext-enable memcached
 
 # Install Memcached
