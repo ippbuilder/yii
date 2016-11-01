@@ -10,7 +10,7 @@ RUN echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/02apt-speedup
 RUN echo "Acquire::http {No-Cache=True;};" > /etc/apt/apt.conf.d/no-cache
 
 # install the PHP extensions we need
-RUN apt-get update && apt-get install -y sendmail libmcrypt-dev libmemcached-dev libpng12-dev libjpeg-dev git \
+RUN apt-get update && apt-get install -y php-memcached sendmail libmcrypt-dev libmemcached-dev libpng12-dev libjpeg-dev git \
     && rm -rf /var/lib/apt/lists/* \
     && pecl install memcached \
     && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
