@@ -11,26 +11,24 @@ RUN echo "Acquire::http {No-Cache=True;};" > /etc/apt/apt.conf.d/no-cache
 
 # install the PHP extensions we need
 RUN apt-get update && apt-get install -y sendmail libmcrypt-dev libmemcached-dev libpng12-dev libjpeg-dev git \
-    && rm -rf /var/lib/apt/lists/* \
-    && pecl install memcached \
-    && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-    && docker-php-ext-install gd mcrypt mysql pdo_mysql \
-    && docker-php-ext-enable memcached
+ && rm -rf /var/lib/apt/lists/* \
+ && pecl install memcached \
+ && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
+ && docker-php-ext-install gd mcrypt mysql pdo_mysql
 
 # Install Memcached
-RUN curl -L -o /tmp/memcached.tar.gz "https://github.com/php-memcached-dev/php-memcached/archive/php7.tar.gz" && \
-mkdir -p memcached && \
-tar -C memcached -zxvf /tmp/memcached.tar.gz --strip 1 && \
-( \
-    cd memcached && \
-    phpize && \
-    ./configure && \
-    make -j$(nproc) && \
-    make install \
-) && \
-rm -r memcached && \
-rm /tmp/memcached.tar.gz && \
-docker-php-ext-enable memcached
+RUN curl -L -o /tmp/memcached.tar.gz "https://github.com/php-memcached-dev/php-memcached/archive/php7.tar.gz" \
+ && mkdir -p memcached \
+ && tar -C memcached -zxvf /tmp/memcached.tar.gz --strip 1 \
+ && cd memcached \
+ && phpize \
+ && ./configure \
+ && make -j$(nproc) \
+ && make install \
+ && cd .. \
+ && rm -r memcached \
+ && rm /tmp/memcached.tar.gz \
+ && docker-php-ext-enable memcached
 
 # install NewRelic
 ENV NR_INSTALL_SILENT true
@@ -46,9 +44,9 @@ RUN curl -sL https://download.newrelic.com/548C16BF.gpg | apt-key add - \
 COPY composer.json /var/www/html/
 COPY composer.lock /var/www/html/
 WORKDIR /var/www/html
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer && \
-    composer self-update --no-progress && \
-    composer install --no-progress
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer \
+ && composer self-update --no-progress \
+ && composer install --no-progress
 
 COPY newrelic.ini /usr/local/etc/php/conf.d/newrelic.ini
 COPY docker-entrypoint.sh /entrypoint.sh
